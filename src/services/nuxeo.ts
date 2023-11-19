@@ -15,7 +15,7 @@ export const sendReportResult = async (request: any) => {
       'note:mime_type': 'text/html',
     },
     schemas: [],
-    name: `Transaction ID: ${request.transactionID}`,
+    name: `Transaction ID: ${request.transaction.EndToEndId}`,
   };
 
   const host = config.nuxeoHost;
@@ -31,7 +31,7 @@ export const sendReportResult = async (request: any) => {
   }
 
   let html = `
-  <h4>Report Details</h4>
+<h4>Report Details</h4>
 <table border="1" style="border: 1px solid #000; border-spacing: 0px; width: 900px; margin-bottom: 25px;">
   <tr>
     <td style="font-weight: bold">Evaluation ID</td>
@@ -41,7 +41,7 @@ export const sendReportResult = async (request: any) => {
   </tr>
   <tr>
     <td>${request.alert.evaluationID}</td>
-    <td>${request.transaction.FIToFIPmtSts.GrpHdr.MsgId}</td>
+    <td>${request.transaction.EndToEndId}</td>
     <td>${request.alert.status}</td>
     <td>${request.alert.timestamp}</td>
   </tr>
