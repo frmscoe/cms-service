@@ -1,36 +1,34 @@
 import axios from 'axios';
-import { Context } from 'koa';
+import { loggerService } from '.';
 import { config } from './config';
 import { sendReportResult } from './services/nuxeo';
-import { LoggerService } from './utils';
 
 export const monitorQuote = async (reqObj: unknown): Promise<void> => {
   try {
     const request = reqObj ?? JSON.parse('');
     if (request.typologyResult)
-      LoggerService.log(
-        `CMS received Interdiction from Typology ${request?.typologyResult?.id ?? 0}@${request?.typologyResult?.cfg ?? 0} - Score: ${
-          request?.typologyResult?.result ?? 0
+      loggerService.log(
+        `CMS received Interdiction from Typology ${request?.typologyResult?.id ?? 0}@${request?.typologyResult?.cfg ?? 0} - Score: ${request?.typologyResult?.result ?? 0
         }, Threshold: ${request?.typologyResult?.threshold ?? 0}.`,
       );
     else {
-      LoggerService.log('CMS received request from TADP.');
+      loggerService.log('CMS received request from TADP.');
 
       if (config.nuxeoReport) {
         try {
-          LoggerService.log('Start - Execute Nuxeo report request');
+          loggerService.log('Start - Execute Nuxeo report request');
           await sendReportResult(request);
         } catch (err) {
           const failMsg = 'Failed to send report';
-          LoggerService.error(failMsg, err, 'executeController');
+          loggerService.error(failMsg, err, 'executeController');
         } finally {
-          LoggerService.log('END - Execute Nuxeo report request');
+          loggerService.log('END - Execute Nuxeo report request');
         }
       }
 
       if (config.forwardRequest) {
         try {
-          LoggerService.log('Start - Execute Sybrin request');
+          loggerService.log('Start - Execute Sybrin request');
           const token = await sendAuthRequest();
           const toSend = {
             ProcessID: 'a8868aed-e1a8-4ca8-88e5-da8d4b5df94d',
@@ -45,27 +43,28 @@ export const monitorQuote = async (reqObj: unknown): Promise<void> => {
           };
           await executePost(config.forwardURL, toSend);
         } catch (error) {
-          LoggerService.error('Failed to forward to Sybrin');
+          loggerService.error('Failed to forward to Sybrin');
         } finally {
-          LoggerService.log('Start - Execute Sybrin request');
+          loggerService.log('Start - Execute Sybrin request');
         }
       }
     }
 
   } catch (error) {
-    LoggerService.log(error as string);
+    loggerService.log(error as string);
   }
 };
 
-const executePost = async (endpoint: string, request: any) => {
+const executePost = async (endpoint: string, request: unknown) => {
   try {
     const cmsRes = await axios.post(endpoint, request);
     if (cmsRes.status !== 200 && cmsRes.status !== 201) {
-      LoggerService.error(`CMS Response unsuccessful with StatusCode: ${cmsRes.status}, request:\r\n${request}`);
+      loggerService.error(`CMS Response unsuccessful with StatusCode: ${cmsRes.status}, request:\r\n${request}`);
     }
   } catch (error) {
-    LoggerService.error(`Error while sending request to CMS at ${endpoint ?? ''} with message: ${error}`);
-    LoggerService.trace(`CMS Error Request:\r\n${request}`);
+    loggerService.error(`Error while sending request to CMS at ${endpoint ?? ''} with message: ${error}`);
+  } finally {
+    loggerService.trace(`CMS Error Request:\r\n${request}`);
   }
 };
 
@@ -77,10 +76,10 @@ const sendAuthRequest = async () => {
       environmentID: config.sybrinEnvironmentID,
     };
     const response = await axios.post(`${config.sybrinBaseURL}/Logon/Logon`, request);
-    if (response.status == 200) return response.data.tokenString;
+    if (response.status === 200) return response.data.tokenString;
     else throw new Error(response.data);
   } catch (error) {
-    LoggerService.error(`Error while logging on to Sybrin with message: ${error}`);
+    loggerService.error(`Error while logging on to Sybrin with message: ${error}`);
     throw error;
   }
 };

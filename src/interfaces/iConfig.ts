@@ -12,6 +12,7 @@ export interface IConfig {
   sybrinUsername:string;
   sybrinPassword:string;
   sybrinEnvironmentID:string;
+  sidecarHost:string;
   nuxeoReport: boolean;
   nuxeoAuth: string;
   nuxeoHost: string;

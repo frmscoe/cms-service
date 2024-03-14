@@ -1,33 +1,22 @@
-/* eslint-disable no-console */
-import { LoggerService } from './utils';
+import './apm';
 import { config } from './config';
-import apm from 'elastic-apm-node';
 import { monitorQuote } from './app.controller';
 import { IStartupService, StartupFactory } from '@frmscoe/frms-coe-startup-lib';
+import { LoggerService } from '@frmscoe/frms-coe-lib';
 
-if (config.apmLogging) {
-  apm.start({
-    serviceName: config.functionName,
-    secretToken: config.apmSecretToken,
-    serverUrl: config.apmURL,
-    usePathAsTransactionName: true,
-    active: config.apmLogging,
-    transactionIgnoreUrls: ['/health'],
-    disableInstrumentations: ['log4js'],
-  });
-}
 export let server: IStartupService;
+export const loggerService: LoggerService = new LoggerService(config.sidecarHost);
 
 export const runServer = async (): Promise<void> => {
   server = new StartupFactory();
   if (config.nodeEnv !== 'test') {
     let isConnected = false;
     for (let retryCount = 0; retryCount < 10; retryCount++) {
-      console.log('Connecting to nats server...');
+      loggerService.log('Connecting to nats server...');
       if (!(await server.init(monitorQuote))) {
         await new Promise((resolve) => setTimeout(resolve, 5000));
       } else {
-        console.log('Connected to nats');
+        loggerService.log('Connected to nats');
         isConnected = true;
         break;
       }
@@ -40,18 +29,18 @@ export const runServer = async (): Promise<void> => {
 };
 
 process.on('uncaughtException', (err) => {
-  LoggerService.error(`process on uncaughtException error: ${err}`);
+  loggerService.error(`process on uncaughtException error: ${err}`);
 });
 
 process.on('unhandledRejection', (err) => {
-  LoggerService.error(`process on unhandledRejection error: ${err}`);
+  loggerService.error(`process on unhandledRejection error: ${err}`);
 });
 
 (async () => {
   try {
     await runServer();
   } catch (err) {
-    LoggerService.error('Error while starting services', err);
+    loggerService.error('Error while starting services', err);
     process.exit(1);
   }
 })();

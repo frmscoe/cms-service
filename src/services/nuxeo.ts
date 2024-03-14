@@ -1,6 +1,6 @@
 import { config } from '../config';
-import { LoggerService } from '../utils/logger';
 import axios from 'axios';
+import { loggerService } from '..';
 
 export const sendReportResult = async (request: any) => {
   const toCreateNote = {
@@ -26,7 +26,7 @@ export const sendReportResult = async (request: any) => {
   });
 
   if (createNoteResponse.status !== 201) {
-    LoggerService.error(`Error while sending request to Nuxeo with error: ${createNoteResponse.data}`);
+    loggerService.error(`Error while sending request to Nuxeo with error: ${createNoteResponse.data}`);
     return;
   }
 
@@ -117,7 +117,7 @@ export const sendReportResult = async (request: any) => {
       }
     }
   }
-  html += `</table>`;
+  html += '</table>';
 
   const noteId = createNoteResponse.data.uid;
   const toAddReport = {
@@ -135,7 +135,7 @@ export const sendReportResult = async (request: any) => {
   });
 
   if (addReportReponse.status !== 200) {
-    LoggerService.error(`Error while sending request to Nuxeo with error: ${addReportReponse.data}`);
+    loggerService.error(`Error while sending request to Nuxeo with error: ${addReportReponse.data}`);
     return;
   }
 
@@ -152,6 +152,6 @@ export const sendReportResult = async (request: any) => {
   });
 
   if (workflowResponse.status !== 201) {
-    LoggerService.error(`Error while sending request to Nuxeo with error: ${workflowResponse.data}`);
+    loggerService.error(`Error while sending request to Nuxeo with error: ${workflowResponse.data}`);
   }
-}
+};
