@@ -46,6 +46,7 @@ ENV FUNCTION_NAME="cms-service"
 ENV NODE_ENV="production"
 ENV REST_PORT=3000
 ENV LOGSTASH_URL=logstash.development:8080
+ENV LOGSTASH_LEVEL='info'
 ENV APM_LOGGING=true
 ENV APM_URL=http://apm-server.development:8200
 ENV APM_SECRET_TOKEN=
@@ -69,6 +70,8 @@ ENV STREAM_SUBJECT=
 ENV ACK_POLICY=Explicit
 ENV PRODUCER_STORAGE=File
 ENV PRODUCER_RETENTION_POLICY=Workqueue
+
+ENV SIDECAR_HOST=0.0.0.0:5000
 
 # Set healthcheck command
 HEALTHCHECK --interval=3s CMD [ -e /tmp/.lock ] || exit 1
