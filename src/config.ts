@@ -23,7 +23,7 @@ const config: IConfig = {
   sybrinPassword: <string>process.env.SYBRIN_PASSWORD,
   sybrinEnvironmentID: <string>process.env.SYBRIN_ENVIRONMENT_ID,
   sidecarHost: <string>process.env.SIDECAR_HOST,
-  nuxeoReport: <boolean>(process.env.NUXEO_RERPORT === 'true'),
+  nuxeoReport: <boolean>(process.env.NUXEO_REPORT === 'true'),
   nuxeoAuth: <string>process.env.NUXEO_AUTH,
   nuxeoHost: <string>process.env.NUXEO_HOST,
   nuxeoFolderPath: <string>process.env.NUXEO_FOLDER_PATH,
